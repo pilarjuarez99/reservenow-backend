@@ -2,6 +2,7 @@ package com.reservenow.model;
 
 import jakarta.persistence.*;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "users")
@@ -22,6 +23,7 @@ public class User {
     private boolean admin;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore  // Evita que Jackson intente serializar esta propiedad y cause error de LazyInitialization
     private List<Reserva> reservas;
 
     // --- Getters y Setters ---

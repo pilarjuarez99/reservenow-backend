@@ -1,7 +1,7 @@
 package com.reservenow.model;
 
 import jakarta.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "products")
@@ -11,34 +11,59 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String titulo;
+
+    @Column(length = 2000)
     private String descripcion;
+
     private String imagenUrl;
 
-    @ManyToOne(fetch = FetchType.EAGER) // ← cambiado de LAZY a EAGER
+    @Column(length = 255)
+    private String ubicacion;
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;
 
-    @ManyToMany(fetch = FetchType.EAGER) // ← cambiado de LAZY a EAGER
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "product_caracteristicas",
         joinColumns = @JoinColumn(name = "product_id"),
         inverseJoinColumns = @JoinColumn(name = "caracteristica_id")
     )
-    private List<Caracteristica> caracteristicas;
+    private Set<Caracteristica> caracteristicas;
 
-    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, fetch = FetchType.EAGER) // ← cambiado de LAZY a EAGER
-    private List<Calificacion> calificaciones;
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<Calificacion> calificaciones;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<Image> images;
+
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<Disponibilidad> disponibilidades;
+
+    // Constructores
     public Product() {}
 
-    public Product(String titulo, String descripcion, String imagenUrl, Categoria categoria) {
+    public Product(String titulo, String descripcion, String imagenUrl, Categoria categoria, String ubicacion) {
         this.titulo = titulo;
         this.descripcion = descripcion;
         this.imagenUrl = imagenUrl;
         this.categoria = categoria;
+        this.ubicacion = ubicacion;
     }
 
+    public Product(Long id, String titulo, String descripcion, String imagenUrl, Categoria categoria, String ubicacion) {
+        this.id = id;
+        this.titulo = titulo;
+        this.descripcion = descripcion;
+        this.imagenUrl = imagenUrl;
+        this.categoria = categoria;
+        this.ubicacion = ubicacion;
+    }
+
+    // Getters y Setters
     public Long getId() {
         return id;
     }
@@ -67,6 +92,14 @@ public class Product {
         this.imagenUrl = imagenUrl;
     }
 
+    public String getUbicacion() {
+        return ubicacion;
+    }
+
+    public void setUbicacion(String ubicacion) {
+        this.ubicacion = ubicacion;
+    }
+
     public Categoria getCategoria() {
         return categoria;
     }
@@ -75,19 +108,35 @@ public class Product {
         this.categoria = categoria;
     }
 
-    public List<Caracteristica> getCaracteristicas() {
+    public Set<Caracteristica> getCaracteristicas() {
         return caracteristicas;
     }
 
-    public void setCaracteristicas(List<Caracteristica> caracteristicas) {
+    public void setCaracteristicas(Set<Caracteristica> caracteristicas) {
         this.caracteristicas = caracteristicas;
     }
 
-    public List<Calificacion> getCalificaciones() {
+    public Set<Calificacion> getCalificaciones() {
         return calificaciones;
     }
 
-    public void setCalificaciones(List<Calificacion> calificaciones) {
+    public void setCalificaciones(Set<Calificacion> calificaciones) {
         this.calificaciones = calificaciones;
+    }
+
+    public Set<Image> getImages() {
+        return images;
+    }
+
+    public void setImages(Set<Image> images) {
+        this.images = images;
+    }
+
+    public Set<Disponibilidad> getDisponibilidades() {
+        return disponibilidades;
+    }
+
+    public void setDisponibilidades(Set<Disponibilidad> disponibilidades) {
+        this.disponibilidades = disponibilidades;
     }
 }

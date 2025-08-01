@@ -29,12 +29,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
-            .headers(headers -> headers.frameOptions().disable())  // Para permitir la consola H2
+            .headers(headers -> headers.frameOptions().disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/api/products/**").permitAll()
                 .requestMatchers("/api/calificaciones/**").permitAll()
+                .requestMatchers("/reservas/**").authenticated()  // ✅ Permitir reservas con JWT
                 .anyRequest().authenticated()
             )
             .cors(cors -> cors.configurationSource(request -> {

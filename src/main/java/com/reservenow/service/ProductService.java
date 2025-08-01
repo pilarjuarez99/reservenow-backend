@@ -2,6 +2,7 @@ package com.reservenow.service;
 
 import com.reservenow.dto.ProductDTO;
 import com.reservenow.model.Product;
+import com.reservenow.model.Image;
 import com.reservenow.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +56,6 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
-    // Búsqueda flexible por palabras sueltas en título o descripción
     public List<ProductDTO> searchProductsByText(String text) {
         if (text == null || text.trim().isEmpty()) {
             return Collections.emptyList();
@@ -74,13 +74,52 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
+    public Product updateProduct(Long id, Product updatedProduct) {
+        return productRepository.findById(id)
+                .map(existingProduct -> {
+                    existingProduct.setTitulo(updatedProduct.getTitulo());
+                    existingProduct.setDescripcion(updatedProduct.getDescripcion());
+                    existingProduct.setImagenUrl(updatedProduct.getImagenUrl());
+                    existingProduct.setCategoria(updatedProduct.getCategoria());
+                    existingProduct.setCaracteristicas(updatedProduct.getCaracteristicas());
+                    existingProduct.setCalificaciones(updatedProduct.getCalificaciones());
+                    existingProduct.setUbicacion(updatedProduct.getUbicacion());
+
+                    if (updatedProduct.getImages() != null) {
+                        existingProduct.getImages().clear();
+                        existingProduct.getImages().addAll(updatedProduct.getImages());
+                    }
+
+                    return productRepository.save(existingProduct);
+                })
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado con id " + id));
+    }
+
     private ProductDTO convertToDTO(Product p) {
+        Set<String> caracteristicas = p.getCaracteristicas() != null
+                ? p.getCaracteristicas().stream()
+                    .map(c -> c.getNombre())
+                    .collect(Collectors.toSet())
+                : Collections.emptySet();
+
+        Set<String> imagenes = p.getImages() != null
+                ? p.getImages().stream()
+                    .map(Image::getUrl)
+                    .collect(Collectors.toSet())
+                : Collections.emptySet();
+
+        Set<String> fechasDisponibles = new HashSet<>(); // A implementar si tenés lógica de fechas
+
         return new ProductDTO(
                 p.getId(),
                 p.getTitulo(),
                 p.getDescripcion(),
                 p.getImagenUrl(),
-                p.getCategoria() != null ? p.getCategoria().getNombre() : null
+                p.getCategoria() != null ? p.getCategoria().getNombre() : null,
+                imagenes,
+                caracteristicas,
+                fechasDisponibles,
+                p.getUbicacion()
         );
     }
 }
